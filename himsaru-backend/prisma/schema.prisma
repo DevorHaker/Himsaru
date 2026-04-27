@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  DISTRIBUTOR
+  CUSTOMER
+}
+
+enum AppStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ProductStatus {
+  ACTIVE
+  DRAFT
+  ARCHIVED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  password     String
+  role         Role     @default(CUSTOMER)
+  firstName    String?
+  lastName     String?
+  phone        String?
+  refreshToken String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orders       Order[]
+  activityLogs ActivityLog[]
+}
+
+model Product {
+  id          String        @id @default(uuid())
+  name        String
+  slug        String        @unique
+  category    String
+  description String
+  pricing     Decimal       @db.Decimal(10, 2)
+  stock       Int           @default(0)
+  images      String[]
+  sku         String        @unique
+  isFeatured  Boolean       @default(false)
+  status      ProductStatus @default(ACTIVE)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model DistributorApplication {
+  id           String    @id @default(uuid())
+  fullName     String
+  phone        String
+  email        String
+  city         String
+  state        String
+  businessType String
+  experience   String
+  message      String?
+  documents    String[]
+  status       AppStatus @default(PENDING)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  status    String   @default("UNREAD")
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  totalAmount Decimal  @db.Decimal(10, 2)
+  status      String   @default("PENDING")
+  paymentId   String?
+  createdAt   DateTime @default(now())
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  details   Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+}
