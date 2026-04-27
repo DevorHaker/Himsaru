@@ -13,12 +13,27 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Nunito', 'system-ui', 'sans-serif'],
+        display: ['Cinzel', 'serif'],
+        serif: ['"Cormorant Garamond"', 'serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        forest: "hsl(var(--forest))",
+        moss: "hsl(var(--moss))",
+        fern: "hsl(var(--fern))",
+        gold: "hsl(var(--gold))",
+        amber: "hsl(var(--amber))",
+        earth: "hsl(var(--earth))",
+        bark: "hsl(var(--bark))",
+        stone: "hsl(var(--stone))",
+        cream: "hsl(var(--cream))",
+        mist: "hsl(var(--mist))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -84,6 +99,10 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-up": "fade-up 0.9s ease both",
+        "fade-down": "fade-down 0.7s ease both",
+        "twinkle": "twinkle 4s ease-in-out infinite",
+        "float-slow": "float-slow 6s ease-in-out infinite",
       },
     },
   },
