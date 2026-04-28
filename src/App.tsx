@@ -6,8 +6,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AuthPage from "./pages/Auth.tsx";
+import Checkout from "./pages/Checkout.tsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
 import { AuthProvider, useAuth } from "./hooks/useAuth.tsx";
+import { CartProvider } from "./contexts/CartContext.tsx";
+import { CartSheet } from "./components/cart/CartSheet.tsx";
 import { Navigate } from "react-router-dom";
 const queryClient = new QueryClient();
 
@@ -21,19 +24,23 @@ const ProtectedAdminRoute = ({ children }: { children: React.ReactNode }) => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
+      <CartProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <CartSheet />
+            <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard onLogout={() => {}} /></ProtectedAdminRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-      </TooltipProvider>
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </CartProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

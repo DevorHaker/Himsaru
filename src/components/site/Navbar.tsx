@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Menu, X, User as UserIcon, LogOut } from "lucide-react";
+import { Menu, X, User as UserIcon, LogOut, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/contexts/CartContext";
 import { Link, useLocation } from "react-router-dom";
 
 const links = [
@@ -15,6 +16,7 @@ const links = [
 
 export const Navbar = () => {
   const { user, logout } = useAuth();
+  const { totalItems, setIsOpen: setMenuCartOpen } = useCart();
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -65,6 +67,19 @@ export const Navbar = () => {
               </a>
             </li>
           ))}
+          <li>
+            <button
+              onClick={() => setMenuCartOpen(true)}
+              className="relative rounded-full border border-gold/30 bg-gold/5 p-2.5 text-amber transition-all hover:bg-gold/15"
+            >
+              <ShoppingBag size={18} />
+              {totalItems > 0 && (
+                <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-amber text-[0.6rem] font-bold text-forest">
+                  {totalItems}
+                </span>
+              )}
+            </button>
+          </li>
           {!user ? (
             <li>
               <Link
@@ -121,7 +136,22 @@ export const Navbar = () => {
                 </a>
               </li>
             ))}
-            <li className="mt-4 border-t border-cream/10 pt-4">
+            <li className="mt-2 border-t border-cream/10 pt-4">
+              <button
+                onClick={() => { setOpen(false); setMenuCartOpen(true); }}
+                className="flex w-full items-center justify-between rounded-md px-4 py-3 text-sm font-semibold uppercase tracking-[0.15em] text-amber hover:bg-white/5"
+              >
+                <div className="flex items-center gap-2">
+                  <ShoppingBag size={16} /> Cart
+                </div>
+                {totalItems > 0 && (
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber text-[0.65rem] font-bold text-forest">
+                    {totalItems}
+                  </span>
+                )}
+              </button>
+            </li>
+            <li className="mt-2 border-t border-cream/10 pt-4">
               {!user ? (
                 <Link
                   to="/auth"

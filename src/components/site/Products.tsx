@@ -6,6 +6,7 @@ import spices from "@/assets/product-spices.jpg";
 import dals from "@/assets/product-dals.jpg";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
+import { useCart } from "@/contexts/CartContext";
 
 const imageMap: Record<string, string> = {
   ghee, honey, salt, rajma, spices, dals
@@ -76,6 +77,7 @@ const products: Product[] = [
 
 export const Products = () => {
   const [liveProducts, setLiveProducts] = useState<any[]>([]);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     // Fetch products from backend
@@ -90,13 +92,19 @@ export const Products = () => {
 
   // Use live products if available, otherwise fallback to static
   const displayProducts = liveProducts.length > 0 ? liveProducts.map(p => ({
+    id: p.id || p.slug,
     name: p.name,
     desc: p.description,
+    rawPrice: Number(p.pricing),
     price: `₹${Number(p.pricing).toLocaleString()}`,
     unit: "", // can add unit to db later if needed
     badge: p.isFeatured ? "Featured" : undefined,
     img: p.images?.[0] && imageMap[p.images[0]] ? imageMap[p.images[0]] : imageMap.ghee // Fallback image
-  })) : products;
+  })) : products.map(p => ({
+    ...p,
+    id: p.name.toLowerCase().replace(/\s+/g, '-'),
+    rawPrice: Number(p.price.replace(/[^0-9.-]+/g, ""))
+  }));
 
   return (
     <section id="products" className="bg-gradient-mist py-24">
@@ -147,12 +155,12 @@ export const Products = () => {
                     <span className="text-2xl font-bold text-gold">{p.price}</span>{" "}
                     {p.unit && <span className="text-sm text-stone">{p.unit}</span>}
                   </div>
-                  <a
-                    href="#contact"
+                  <button
+                    onClick={() => addToCart({ id: p.id, name: p.name, price: p.rawPrice, img: p.img })}
                     className="rounded-full bg-forest px-4 py-2 text-[0.7rem] font-bold uppercase tracking-[0.15em] text-cream transition-colors hover:bg-moss"
                   >
-                    Order
-                  </a>
+                    Add to Cart
+                  </button>
                 </div>
               </div>
             </article>
