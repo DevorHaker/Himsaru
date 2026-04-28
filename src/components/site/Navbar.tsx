@@ -95,6 +95,8 @@ export const Navbar = () => {
                 <li>
                   <Link
                     to="/admin"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-amber hover:text-gold"
                   >
                     Admin Panel
@@ -165,6 +167,8 @@ export const Navbar = () => {
                   {user.role === 'ADMIN' && (
                     <Link
                       to="/admin"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       onClick={() => setOpen(false)}
                       className="block rounded-md px-4 py-3 text-sm font-semibold uppercase tracking-[0.15em] text-amber hover:bg-white/5"
                     >
