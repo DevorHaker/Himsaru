@@ -11,6 +11,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
 import { AuthProvider, useAuth } from "./hooks/useAuth.tsx";
 import { CartProvider } from "./contexts/CartContext.tsx";
 import { CartSheet } from "./components/cart/CartSheet.tsx";
+import { FloatingCart } from "./components/cart/FloatingCart.tsx";
 import { Navigate } from "react-router-dom";
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <CartSheet />
+            <FloatingCart />
             <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<AuthPage />} />

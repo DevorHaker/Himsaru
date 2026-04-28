@@ -55,7 +55,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return [...current, { ...product, quantity: 1 }];
     });
     toast({ title: "Added to Cart", description: `${product.name} was added to your cart.` });
-    setIsOpen(true);
   };
 
   const removeFromCart = (id: string) => {
