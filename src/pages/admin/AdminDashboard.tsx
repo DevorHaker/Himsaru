@@ -5,7 +5,7 @@ import { toast } from '@/hooks/use-toast';
 import {
   Mountain, LogOut, Mail, Users, Handshake, BarChart3,
   Check, X, Trash2, RefreshCw, Eye, Clock, ChevronDown,
-  Inbox, AlertCircle,
+  Inbox, AlertCircle, ShoppingBag
 } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -26,7 +26,7 @@ interface DistributorApp {
   message?: string; status: string; createdAt: string;
 }
 
-type Tab = 'overview' | 'contacts' | 'distributors';
+type Tab = 'overview' | 'orders' | 'contacts' | 'distributors';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const fmtDate = (d: string) =>
@@ -153,9 +153,13 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     }
   };
 
+  const orderRequests = contacts.filter(c => c.subject === 'New Order Request');
+  const regularContacts = contacts.filter(c => c.subject !== 'New Order Request');
+
   const TABS: { id: Tab; label: string; icon: any }[] = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
-    { id: 'contacts', label: `Messages (${contacts.length})`, icon: Mail },
+    { id: 'orders', label: `Orders (${orderRequests.length})`, icon: ShoppingBag },
+    { id: 'contacts', label: `Messages (${regularContacts.length})`, icon: Mail },
     { id: 'distributors', label: `Applications (${distributors.length})`, icon: Handshake },
   ];
 
@@ -230,9 +234,12 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
             {stats ? (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <StatCard icon={Mail} label="Total Messages" value={stats.totalContacts}
-                  sub={stats.unreadContacts > 0 ? 'UNREAD' : undefined}
-                  highlight={stats.unreadContacts > 0} />
+                <StatCard icon={ShoppingBag} label="Order Requests" value={orderRequests.length}
+                  sub={orderRequests.some(o => o.status === 'UNREAD') ? 'UNREAD' : undefined}
+                  highlight={orderRequests.some(o => o.status === 'UNREAD')} />
+                <StatCard icon={Mail} label="Total Messages" value={regularContacts.length}
+                  sub={regularContacts.some(c => c.status === 'UNREAD') ? 'UNREAD' : undefined}
+                  highlight={regularContacts.some(c => c.status === 'UNREAD')} />
                 <StatCard icon={Handshake} label="Distributor Apps" value={stats.totalApplications}
                   sub={stats.pendingApplications > 0 ? 'PENDING' : undefined}
                   highlight={stats.pendingApplications > 0} />
@@ -280,18 +287,18 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold text-cream">Contact Messages</h2>
-                <p className="mt-1 text-sm text-cream/50">{contacts.filter(c => c.status === 'UNREAD').length} unread of {contacts.length} total</p>
+                <p className="mt-1 text-sm text-cream/50">{regularContacts.filter(c => c.status === 'UNREAD').length} unread of {regularContacts.length} total</p>
               </div>
             </div>
 
-            {contacts.length === 0 ? (
+            {regularContacts.length === 0 ? (
               <div className="flex flex-col items-center gap-3 py-20 text-cream/30">
                 <Inbox size={40} />
                 <p>No contact messages yet</p>
               </div>
             ) : (
               <div className="space-y-3">
-                {contacts.map((c) => (
+                {regularContacts.map((c) => (
                   <div key={c.id} className={`rounded-2xl border transition-all ${c.status === 'UNREAD' ? 'border-amber/25 bg-amber/5' : 'border-cream/10 bg-cream/5'}`}>
                     <button
                       onClick={() => setExpandedId(expandedId === c.id ? null : c.id)}
@@ -328,6 +335,74 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                           )}
                           <button
                             onClick={() => deleteContact(c.id)}
+                            className="flex items-center gap-1.5 rounded-lg bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-400 hover:bg-red-500/20 transition-colors"
+                          >
+                            <Trash2 size={12} /> Delete
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Orders Tab */}
+        {tab === 'orders' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-cream">Order Requests</h2>
+                <p className="mt-1 text-sm text-cream/50">{orderRequests.filter(o => o.status === 'UNREAD').length} unread of {orderRequests.length} total</p>
+              </div>
+            </div>
+
+            {orderRequests.length === 0 ? (
+              <div className="flex flex-col items-center gap-3 py-20 text-cream/30">
+                <ShoppingBag size={40} />
+                <p>No order requests yet</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {orderRequests.map((o) => (
+                  <div key={o.id} className={`rounded-2xl border transition-all ${o.status === 'UNREAD' ? 'border-amber/25 bg-amber/5' : 'border-cream/10 bg-cream/5'}`}>
+                    <button
+                      onClick={() => setExpandedId(expandedId === o.id ? null : o.id)}
+                      className="flex w-full items-center justify-between p-4 text-left"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`h-2 w-2 flex-shrink-0 rounded-full ${o.status === 'UNREAD' ? 'bg-amber' : 'bg-cream/20'}`} />
+                        <div>
+                          <p className="text-sm font-semibold text-cream">{o.name}
+                            <span className="ml-2 text-xs font-normal text-cream/45">{o.email}</span>
+                          </p>
+                          <p className="text-xs text-cream/60">{o.subject}</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-shrink-0 items-center gap-2 ml-4">
+                        <span className={statusBadge(o.status)}>{o.status}</span>
+                        <span className="text-xs text-cream/35">{fmtDate(o.createdAt)}</span>
+                        <ChevronDown size={14} className={`text-cream/40 transition-transform ${expandedId === o.id ? 'rotate-180' : ''}`} />
+                      </div>
+                    </button>
+
+                    {expandedId === o.id && (
+                      <div className="border-t border-cream/10 px-4 pb-4 pt-3">
+                        <pre className="text-sm leading-relaxed text-cream/80 whitespace-pre-wrap font-sans">{o.message}</pre>
+                        {o.phone && <p className="mt-2 text-xs text-cream/45">📞 {o.phone}</p>}
+                        <div className="mt-4 flex gap-2">
+                          {o.status === 'UNREAD' && (
+                            <button
+                              onClick={() => markRead(o.id)}
+                              className="flex items-center gap-1.5 rounded-lg bg-amber/15 px-3 py-1.5 text-xs font-semibold text-amber hover:bg-amber/25 transition-colors"
+                            >
+                              <Eye size={12} /> Mark as Read
+                            </button>
+                          )}
+                          <button
+                            onClick={() => deleteContact(o.id)}
                             className="flex items-center gap-1.5 rounded-lg bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-400 hover:bg-red-500/20 transition-colors"
                           >
                             <Trash2 size={12} /> Delete
