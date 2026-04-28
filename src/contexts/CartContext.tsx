@@ -54,7 +54,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...current, { ...product, quantity: 1 }];
     });
-    toast({ title: "Added to Cart", description: `${product.name} was added to your cart.` });
+    toast({ 
+      title: "Added to Cart", 
+      description: `${product.name} was added to your cart.`,
+      duration: 2000 
+    });
   };
 
   const removeFromCart = (id: string) => {
