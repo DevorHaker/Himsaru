@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useAdmin } from '@/hooks/useAdmin';
+import { useAuth } from '@/hooks/useAuth';
 import { api } from '@/lib/api';
 import { toast } from '@/hooks/use-toast';
 import {
@@ -63,7 +63,7 @@ function StatCard({ icon: Icon, label, value, sub, highlight }: {
 
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
-  const { user, token, logout } = useAdmin();
+  const { user, token, logout } = useAuth();
   const [tab, setTab] = useState<Tab>('overview');
   const [stats, setStats] = useState<Stats | null>(null);
   const [contacts, setContacts] = useState<ContactMsg[]>([]);

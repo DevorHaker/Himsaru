@@ -5,24 +5,36 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
-import AdminPage from "./pages/admin/index.tsx";
-
+import AuthPage from "./pages/Auth.tsx";
+import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
+import { AuthProvider, useAuth } from "./hooks/useAuth.ts";
+import { Navigate } from "react-router-dom";
 const queryClient = new QueryClient();
+
+const ProtectedAdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, isLoading } = useAuth();
+  if (isLoading) return <div className="min-h-screen bg-forest flex items-center justify-center text-cream">Loading...</div>;
+  if (!user || user.role !== 'ADMIN') return <Navigate to="/auth" replace />;
+  return <>{children}</>;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard onLogout={() => {}} /></ProtectedAdminRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
-    </TooltipProvider>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
