@@ -8,9 +8,11 @@ import {
 } from "@/components/ui/sheet";
 import { ShoppingBag, X, Plus, Minus, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 export const CartSheet = () => {
   const { items, isOpen, setIsOpen, updateQuantity, removeFromCart, totalPrice, totalItems } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -78,7 +80,11 @@ export const CartSheet = () => {
             <button
               onClick={() => {
                 setIsOpen(false);
-                navigate("/checkout");
+                if (user) {
+                  navigate("/checkout");
+                } else {
+                  navigate("/auth", { state: { from: { pathname: "/checkout" } } });
+                }
               }}
               className="w-full rounded-xl bg-gradient-gold py-4 text-sm font-bold uppercase tracking-[0.18em] text-forest shadow-gold transition-transform hover:-translate-y-0.5"
             >
