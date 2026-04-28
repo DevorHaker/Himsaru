@@ -9,7 +9,7 @@ const startServer = async () => {
   try {
     // Add Database Connection check here later (e.g., Prisma connect)
     
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`[Server] HIMSARU Backend is running on port ${PORT}`);
     });
   } catch (error) {
