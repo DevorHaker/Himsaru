@@ -1,19 +1,33 @@
 import { useState } from "react";
 import { Mail, Phone, MapPin, Send, Instagram, Facebook, MessageCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { api } from "@/lib/api";
 
 export const Contact = () => {
   const [sending, setSending] = useState(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSending(true);
-    setTimeout(() => {
-      setSending(false);
-      (e.target as HTMLFormElement).reset();
+    const form = e.target as HTMLFormElement;
+    const data = Object.fromEntries(new FormData(form));
+    try {
+      await api.post('/contact', {
+        name: data.name,
+        email: data.email,
+        phone: data.phone || undefined,
+        subject: data.subject,
+        message: data.message,
+      });
+      form.reset();
       toast({ title: "Message sent ✨", description: "Dhanyavaad! We'll get back to you soon." });
-    }, 700);
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message || "Failed to send message.", variant: "destructive" });
+    } finally {
+      setSending(false);
+    }
   };
+
 
   return (
     <section id="contact" className="relative overflow-hidden bg-gradient-forest py-24">

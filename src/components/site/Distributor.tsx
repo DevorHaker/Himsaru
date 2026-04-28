@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Check, MapPin, Phone, Mail } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { api } from "@/lib/api";
 
 const benefits = [
   "Authentic Pahadi products with high margins",
@@ -12,19 +13,34 @@ const benefits = [
 export const Distributor = () => {
   const [submitting, setSubmitting] = useState(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
-      (e.target as HTMLFormElement).reset();
+    const form = e.target as HTMLFormElement;
+    const data = Object.fromEntries(new FormData(form));
+    try {
+      await api.post('/distributor', {
+        fullName: data.name,
+        phone: data.phone,
+        email: data.email,
+        city: data.city,
+        state: data.state || 'N/A',
+        businessType: data.businessType || 'General',
+        experience: data.experience || 'N/A',
+        message: data.message || undefined,
+      });
+      form.reset();
       toast({
         title: "Application received 🙏",
-        description:
-          "Namaste! Our team will reach out within 48 hours from the mountains.",
+        description: "Namaste! Our team will reach out within 48 hours from the mountains.",
       });
-    }, 700);
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message || "Failed to submit application.", variant: "destructive" });
+    } finally {
+      setSubmitting(false);
+    }
   };
+
 
   return (
     <>
