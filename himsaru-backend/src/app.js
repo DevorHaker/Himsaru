@@ -33,6 +33,7 @@ app.use(morgan('dev'));
 import authRoutes from './routes/authRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import distributorRoutes from './routes/distributorRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 // Health Check Route
 app.get('/api/health', (req, res) => {
@@ -43,6 +44,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/distributor', distributorRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 404 Route
 app.use((req, res, next) => {
