@@ -123,7 +123,7 @@ export const Navbar = () => {
       </div>
 
       {open && (
-        <div className="absolute inset-x-0 top-full border-t border-gold/20 bg-forest/98 backdrop-blur-md md:hidden">
+        <div className="absolute inset-x-0 top-full h-[calc(100vh-60px)] overflow-y-auto border-t border-gold/20 bg-forest shadow-2xl md:hidden">
           <ul className="flex flex-col gap-1 p-4">
             {isHomePage && links.map((l) => (
               <li key={l.href}>
