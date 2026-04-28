@@ -86,19 +86,21 @@ export const Contact = () => {
           </h3>
           <div className="mt-6 space-y-4">
             {[
-              { label: "Your Name", name: "name", type: "text" },
-              { label: "Email Address", name: "email", type: "email" },
-              { label: "Subject", name: "subject", type: "text" },
+              { label: "Your Name", name: "name", type: "text", placeholder: "e.g. Anjali Rawat", required: true },
+              { label: "Email Address", name: "email", type: "email", placeholder: "you@email.com", required: true },
+              { label: "Phone (optional)", name: "phone", type: "tel", placeholder: "+91 XXXXX XXXXX", required: false },
+              { label: "Subject", name: "subject", type: "text", placeholder: "How can we help?", required: true },
             ].map((f) => (
               <div key={f.name}>
                 <label className="block text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-cream/60">
                   {f.label}
                 </label>
                 <input
-                  required
+                  required={f.required}
                   name={f.name}
                   type={f.type}
-                  className="mt-2 w-full rounded-xl border border-cream/15 bg-cream/10 px-4 py-3 text-sm text-cream outline-none transition-colors focus:border-amber"
+                  placeholder={f.placeholder}
+                  className="mt-2 w-full rounded-xl border border-cream/15 bg-cream/10 px-4 py-3 text-sm text-cream placeholder:text-cream/40 outline-none transition-colors focus:border-amber"
                 />
               </div>
             ))}

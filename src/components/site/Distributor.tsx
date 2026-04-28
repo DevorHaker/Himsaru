@@ -10,6 +10,24 @@ const benefits = [
   "Exclusive territory rights available",
 ];
 
+const BUSINESS_TYPES = [
+  "Retailer",
+  "Wholesaler",
+  "Distributor",
+  "Online Seller (Amazon/Flipkart)",
+  "Grocery Chain",
+  "Organic Store",
+  "Other",
+];
+
+const EXPERIENCE_OPTIONS = [
+  "No prior experience",
+  "Less than 1 year",
+  "1–3 years",
+  "3–5 years",
+  "5+ years",
+];
+
 export const Distributor = () => {
   const [submitting, setSubmitting] = useState(false);
 
@@ -20,14 +38,14 @@ export const Distributor = () => {
     const data = Object.fromEntries(new FormData(form));
     try {
       await api.post('/distributor', {
-        fullName: data.name,
-        phone: data.phone,
-        email: data.email,
-        city: data.city,
-        state: data.state || 'N/A',
-        businessType: data.businessType || 'General',
-        experience: data.experience || 'N/A',
-        message: data.message || undefined,
+        fullName: data.fullName as string,
+        phone: data.phone as string,
+        email: data.email as string,
+        city: data.city as string,
+        state: data.state as string,
+        businessType: data.businessType as string,
+        experience: data.experience as string,
+        message: (data.message as string) || undefined,
       });
       form.reset();
       toast({
@@ -88,28 +106,99 @@ export const Distributor = () => {
               🏔 Apply to Distribute
             </h3>
             <div className="mt-6 space-y-4">
-              {[
-                { label: "Full Name", name: "name", type: "text", placeholder: "Your name" },
-                { label: "Phone", name: "phone", type: "tel", placeholder: "+91" },
-                { label: "Email", name: "email", type: "email", placeholder: "you@email.com" },
-                { label: "City / Region", name: "city", type: "text", placeholder: "City, State" },
-              ].map((f) => (
-                <div key={f.name}>
-                  <label className="block text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-cream/60">
-                    {f.label}
-                  </label>
+              {/* Row: Full Name + Phone */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                {[
+                  { label: "Full Name", name: "fullName", type: "text", placeholder: "Your full name" },
+                  { label: "Phone / WhatsApp", name: "phone", type: "tel", placeholder: "+91 XXXXX XXXXX" },
+                ].map((f) => (
+                  <div key={f.name}>
+                    <label className="block text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-cream/60">
+                      {f.label}
+                    </label>
+                    <input
+                      required
+                      name={f.name}
+                      type={f.type}
+                      placeholder={f.placeholder}
+                      className="mt-2 w-full rounded-xl border border-cream/15 bg-cream/10 px-4 py-3 text-sm text-cream placeholder:text-cream/40 outline-none transition-colors focus:border-amber"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-cream/60">Email Address</label>
+                <input
+                  required
+                  name="email"
+                  type="email"
+                  placeholder="you@email.com"
+                  className="mt-2 w-full rounded-xl border border-cream/15 bg-cream/10 px-4 py-3 text-sm text-cream placeholder:text-cream/40 outline-none transition-colors focus:border-amber"
+                />
+              </div>
+
+              {/* Row: City + State */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-cream/60">City</label>
                   <input
                     required
-                    name={f.name}
-                    type={f.type}
-                    placeholder={f.placeholder}
+                    name="city"
+                    type="text"
+                    placeholder="e.g. Dehradun"
                     className="mt-2 w-full rounded-xl border border-cream/15 bg-cream/10 px-4 py-3 text-sm text-cream placeholder:text-cream/40 outline-none transition-colors focus:border-amber"
                   />
                 </div>
-              ))}
+                <div>
+                  <label className="block text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-cream/60">State</label>
+                  <input
+                    required
+                    name="state"
+                    type="text"
+                    placeholder="e.g. Uttarakhand"
+                    className="mt-2 w-full rounded-xl border border-cream/15 bg-cream/10 px-4 py-3 text-sm text-cream placeholder:text-cream/40 outline-none transition-colors focus:border-amber"
+                  />
+                </div>
+              </div>
+
+              {/* Row: Business Type + Experience */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-cream/60">Business Type</label>
+                  <select
+                    required
+                    name="businessType"
+                    defaultValue=""
+                    className="mt-2 w-full rounded-xl border border-cream/15 bg-cream/10 px-4 py-3 text-sm text-cream outline-none transition-colors focus:border-amber appearance-none"
+                  >
+                    <option value="" disabled className="bg-forest">Select type...</option>
+                    {BUSINESS_TYPES.map((t) => (
+                      <option key={t} value={t} className="bg-forest">{t}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-cream/60">Distribution Experience</label>
+                  <select
+                    required
+                    name="experience"
+                    defaultValue=""
+                    className="mt-2 w-full rounded-xl border border-cream/15 bg-cream/10 px-4 py-3 text-sm text-cream outline-none transition-colors focus:border-amber appearance-none"
+                  >
+                    <option value="" disabled className="bg-forest">Select experience...</option>
+                    {EXPERIENCE_OPTIONS.map((o) => (
+                      <option key={o} value={o} className="bg-forest">{o}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Message */}
               <div>
                 <label className="block text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-cream/60">
-                  Tell us about yourself
+                  Tell us about yourself <span className="text-cream/35 normal-case">(optional)</span>
                 </label>
                 <textarea
                   name="message"
@@ -118,12 +207,13 @@ export const Distributor = () => {
                   className="mt-2 w-full resize-none rounded-xl border border-cream/15 bg-cream/10 px-4 py-3 text-sm text-cream placeholder:text-cream/40 outline-none transition-colors focus:border-amber"
                 />
               </div>
+
               <button
                 type="submit"
                 disabled={submitting}
                 className="mt-2 w-full rounded-xl bg-gradient-gold px-6 py-3.5 text-sm font-bold uppercase tracking-[0.18em] text-forest shadow-gold transition-all hover:-translate-y-0.5 disabled:opacity-60"
               >
-                {submitting ? "Sending..." : "Submit Application"}
+                {submitting ? "Sending Application..." : "Submit Application"}
               </button>
             </div>
           </form>
