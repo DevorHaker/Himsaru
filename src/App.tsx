@@ -7,7 +7,7 @@ import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AuthPage from "./pages/Auth.tsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
-import { AuthProvider, useAuth } from "./hooks/useAuth.ts";
+import { AuthProvider, useAuth } from "./hooks/useAuth.tsx";
 import { Navigate } from "react-router-dom";
 const queryClient = new QueryClient();
 
