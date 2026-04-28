@@ -4,6 +4,12 @@ import salt from "@/assets/product-salt.jpg";
 import rajma from "@/assets/product-rajma.jpg";
 import spices from "@/assets/product-spices.jpg";
 import dals from "@/assets/product-dals.jpg";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
+
+const imageMap: Record<string, string> = {
+  ghee, honey, salt, rajma, spices, dals
+};
 
 type Product = {
   img: string;
@@ -69,6 +75,29 @@ const products: Product[] = [
 ];
 
 export const Products = () => {
+  const [liveProducts, setLiveProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Fetch products from backend
+    api.get('/products')
+      .then((res) => {
+        if (res.data && res.data.length > 0) {
+          setLiveProducts(res.data);
+        }
+      })
+      .catch((err) => console.error("Failed to fetch products:", err));
+  }, []);
+
+  // Use live products if available, otherwise fallback to static
+  const displayProducts = liveProducts.length > 0 ? liveProducts.map(p => ({
+    name: p.name,
+    desc: p.description,
+    price: `₹${Number(p.pricing).toLocaleString()}`,
+    unit: "", // can add unit to db later if needed
+    badge: p.isFeatured ? "Featured" : undefined,
+    img: p.images?.[0] && imageMap[p.images[0]] ? imageMap[p.images[0]] : imageMap.ghee // Fallback image
+  })) : products;
+
   return (
     <section id="products" className="bg-gradient-mist py-24">
       <div className="container-narrow">
@@ -86,7 +115,7 @@ export const Products = () => {
         </div>
 
         <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {products.map((p) => (
+          {displayProducts.map((p) => (
             <article
               key={p.name}
               className="group flex flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-soft transition-all duration-500 hover:-translate-y-2 hover:shadow-elevated"
@@ -116,7 +145,7 @@ export const Products = () => {
                 <div className="mt-5 flex items-end justify-between border-t border-border pt-4">
                   <div className="font-serif">
                     <span className="text-2xl font-bold text-gold">{p.price}</span>{" "}
-                    <span className="text-sm text-stone">{p.unit}</span>
+                    {p.unit && <span className="text-sm text-stone">{p.unit}</span>}
                   </div>
                   <a
                     href="#contact"
