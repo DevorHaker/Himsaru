@@ -46,16 +46,21 @@ export default function Checkout() {
         throw new Error("You must be logged in to place an order.");
       }
 
-      await api.post("/orders", {
+      console.log('[Checkout] Submitting order with token:', token ? 'present' : 'MISSING');
+      console.log('[Checkout] Items:', items);
+
+      const result = await api.post("/orders", {
         items,
         totalAmount: totalPrice,
         ...formData
       }, token);
 
+      console.log('[Checkout] Order success:', result);
       clearCart();
       setIsSuccess(true);
       toast({ title: "Order Placed", description: "Your order request has been sent successfully!" });
     } catch (error: any) {
+      console.error('[Checkout] Order error:', error);
       toast({ title: "Order Failed", description: error.message || "Could not place order.", variant: "destructive" });
     } finally {
       setIsSubmitting(false);
