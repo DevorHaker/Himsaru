@@ -25,7 +25,6 @@ export const createOrder = async (req, res) => {
         status: 'PENDING',
         items: {
           create: items.map(item => ({
-            productId: item.id,
             name: item.name,
             price: item.price,
             quantity: item.quantity,
