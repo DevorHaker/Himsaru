@@ -40,8 +40,10 @@ export const createOrder = async (req, res) => {
 
     res.status(201).json({ status: 'success', data: order });
   } catch (error) {
-    console.error('[Create Order Error]:', error);
-    res.status(500).json({ status: 'error', message: 'Could not create order' });
+    console.error('[Create Order Error] Full error:', JSON.stringify(error, null, 2));
+    console.error('[Create Order Error] Message:', error.message);
+    console.error('[Create Order Error] Code:', error.code);
+    res.status(500).json({ status: 'error', message: error.message || 'Could not create order' });
   }
 };
 
