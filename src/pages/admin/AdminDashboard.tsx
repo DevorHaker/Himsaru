@@ -674,7 +674,6 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             )}
           </div>
         )}
-        )}
 
         {/* ── Products Tab */}
         {tab === 'products' && (
