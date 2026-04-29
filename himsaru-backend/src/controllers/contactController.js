@@ -13,7 +13,7 @@ export const submitContact = async (req, res) => {
       data: { name, email, phone, subject, message },
     });
 
-    // Send notification email
+    // Send notification email asynchronously
     const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || process.env.EMAIL_FROM;
     if (adminEmail) {
       const emailHtml = `
@@ -26,11 +26,11 @@ export const submitContact = async (req, res) => {
         <blockquote style="border-left: 4px solid #ccc; padding-left: 10px;">${message}</blockquote>
         <p><a href="${process.env.FRONTEND_URL || 'https://himsaru.vercel.app'}/admin">View in Admin Dashboard</a></p>
       `;
-      await sendEmail({
+      sendEmail({
         to: adminEmail,
         subject: `[HIMSARU] New Contact Message: ${subject}`,
         html: emailHtml,
-      });
+      }).catch(err => console.error('[Email Notification Failed]:', err));
     }
 
     res.status(201).json({ status: 'success', message: 'Message received!', data: contact });

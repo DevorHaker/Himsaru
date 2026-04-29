@@ -13,7 +13,7 @@ export const submitApplication = async (req, res) => {
       data: { fullName, phone, email, city, state, businessType, experience, message },
     });
 
-    // Send notification email
+    // Send notification email asynchronously
     const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || process.env.EMAIL_FROM;
     if (adminEmail) {
       const emailHtml = `
@@ -27,11 +27,11 @@ export const submitApplication = async (req, res) => {
         ${message ? `<p><strong>Message:</strong></p><blockquote style="border-left: 4px solid #ccc; padding-left: 10px;">${message}</blockquote>` : ''}
         <p><br/><a href="${process.env.FRONTEND_URL || 'https://himsaru.vercel.app'}/admin">View in Admin Dashboard</a></p>
       `;
-      await sendEmail({
+      sendEmail({
         to: adminEmail,
         subject: `[HIMSARU] New Distributor App from ${fullName}`,
         html: emailHtml,
-      });
+      }).catch(err => console.error('[Email Notification Failed]:', err));
     }
 
     res.status(201).json({ status: 'success', message: 'Application submitted!', data: application });
