@@ -19,11 +19,11 @@ export default function Checkout() {
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
     email: user?.email || "",
-    phone: "",
-    address: "",
-    city: "",
-    state: "",
-    pincode: "",
+    phone: user?.phone || "",
+    address: user?.address || "",
+    city: user?.city || "",
+    state: user?.state || "",
+    pincode: user?.pincode || "",
   });
 
   useEffect(() => {

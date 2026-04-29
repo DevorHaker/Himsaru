@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound.tsx";
 import AuthPage from "./pages/Auth.tsx";
 import Checkout from "./pages/Checkout.tsx";
 import MyOrders from "./pages/MyOrders.tsx";
+import Profile from "./pages/Profile.tsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
 import { AuthProvider, useAuth } from "./hooks/useAuth.tsx";
 import { CartProvider } from "./contexts/CartContext.tsx";
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/orders" element={<MyOrders />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard onLogout={() => {}} /></ProtectedAdminRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

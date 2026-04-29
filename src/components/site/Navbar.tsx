@@ -108,7 +108,15 @@ export const Navbar = () => {
                   to="/orders"
                   className="text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-cream/70 hover:text-amber transition-colors"
                 >
-                  My Orders
+                  Orders
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/profile"
+                  className="text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-cream/70 hover:text-amber transition-colors"
+                >
+                  Profile
                 </Link>
               </li>
               <li>
@@ -189,6 +197,13 @@ export const Navbar = () => {
                     className="block rounded-md px-4 py-3 text-sm font-semibold uppercase tracking-[0.15em] text-cream/70 hover:bg-white/5 hover:text-amber"
                   >
                     My Orders
+                  </Link>
+                  <Link
+                    to="/profile"
+                    onClick={() => setOpen(false)}
+                    className="block rounded-md px-4 py-3 text-sm font-semibold uppercase tracking-[0.15em] text-cream/70 hover:bg-white/5 hover:text-amber"
+                  >
+                    My Profile
                   </Link>
                   <button
                     onClick={() => { logout(); setOpen(false); }}

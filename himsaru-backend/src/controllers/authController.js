@@ -89,3 +89,42 @@ export const getMe = async (req, res) => {
     data: req.user
   });
 };
+
+export const updateMe = async (req, res) => {
+  try {
+    const { firstName, lastName, phone, address, city, state, pincode } = req.body;
+    
+    const updatedUser = await prisma.user.update({
+      where: { id: req.user.id },
+      data: {
+        firstName,
+        lastName,
+        phone,
+        address,
+        city,
+        state,
+        pincode
+      }
+    });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Profile updated successfully',
+      data: {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        phone: updatedUser.phone,
+        address: updatedUser.address,
+        city: updatedUser.city,
+        state: updatedUser.state,
+        pincode: updatedUser.pincode,
+        role: updatedUser.role
+      }
+    });
+  } catch (error) {
+    console.error('[Update Profile Error]:', error);
+    res.status(500).json({ status: 'error', message: 'Failed to update profile' });
+  }
+};
