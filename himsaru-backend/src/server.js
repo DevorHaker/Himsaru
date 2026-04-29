@@ -11,12 +11,10 @@ const startServer = async () => {
     console.log('[Database] Syncing schema...');
     try {
       const { default: prisma } = await import('./models/prisma.js');
-      await prisma.$executeRawUnsafe(`
-        ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "address" TEXT;
-        ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "city" TEXT;
-        ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "state" TEXT;
-        ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "pincode" TEXT;
-      `);
+      await prisma.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "address" TEXT;`);
+      await prisma.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "city" TEXT;`);
+      await prisma.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "state" TEXT;`);
+      await prisma.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "pincode" TEXT;`);
       console.log('[Database] Schema sync successful.');
     } catch (dbError) {
       console.error('[Database] Schema sync failed (might already exist):', dbError.message);
