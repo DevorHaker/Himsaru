@@ -25,6 +25,15 @@ interface DistributorApp {
   city: string; state: string; businessType: string; experience: string;
   message?: string; status: string; createdAt: string;
 }
+interface OrderItem {
+  id: string; name: string; price: number; quantity: number; image?: string;
+}
+interface Order {
+  id: string; userId: string; firstName: string; lastName: string;
+  email: string; phone: string; address: string; city: string; state: string;
+  pincode: string; totalAmount: number; status: string; createdAt: string;
+  items: OrderItem[];
+}
 
 type Tab = 'overview' | 'orders' | 'contacts' | 'distributors';
 
@@ -68,6 +77,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const [stats, setStats] = useState<Stats | null>(null);
   const [contacts, setContacts] = useState<ContactMsg[]>([]);
   const [distributors, setDistributors] = useState<DistributorApp[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -77,14 +87,16 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     if (!token) return;
     setLoading(true);
     try {
-      const [s, c, d] = await Promise.all([
+      const [s, c, d, o] = await Promise.all([
         api.get('/admin/stats', token),
         api.get('/admin/contacts', token),
         api.get('/admin/distributors', token),
+        api.get('/orders/admin', token),
       ]);
       setStats(s.data);
       setContacts(c.data);
       setDistributors(d.data);
+      setOrders(o.data);
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
     } finally {
@@ -153,12 +165,27 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     }
   };
 
-  const orderRequests = contacts.filter(c => c.subject === 'New Order Request');
-  const regularContacts = contacts.filter(c => c.subject !== 'New Order Request');
+  const updateOrdStatus = async (id: string, status: string) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'https://himsaru-backend.onrender.com/api'}/orders/${id}/status`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (res.ok) {
+        setOrders(orders.map(o => o.id === id ? { ...o, status } : o));
+        toast({ title: 'Status updated', description: `Order status changed to ${status}.` });
+      }
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    }
+  };
+
+  const regularContacts = contacts; // All contacts, old orders might still be here but that's ok
 
   const TABS: { id: Tab; label: string; icon: any }[] = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
-    { id: 'orders', label: `Orders (${orderRequests.length})`, icon: ShoppingBag },
+    { id: 'orders', label: `Orders (${orders.length})`, icon: ShoppingBag },
     { id: 'contacts', label: `Messages (${regularContacts.length})`, icon: Mail },
     { id: 'distributors', label: `Applications (${distributors.length})`, icon: Handshake },
   ];
@@ -234,9 +261,9 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
             {stats ? (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <StatCard icon={ShoppingBag} label="Order Requests" value={orderRequests.length}
-                  sub={orderRequests.some(o => o.status === 'UNREAD') ? 'UNREAD' : undefined}
-                  highlight={orderRequests.some(o => o.status === 'UNREAD')} />
+                <StatCard icon={ShoppingBag} label="Orders" value={orders.length}
+                  sub={orders.some(o => o.status === 'PENDING') ? 'PENDING' : undefined}
+                  highlight={orders.some(o => o.status === 'PENDING')} />
                 <StatCard icon={Mail} label="Total Messages" value={regularContacts.length}
                   sub={regularContacts.some(c => c.status === 'UNREAD') ? 'UNREAD' : undefined}
                   highlight={regularContacts.some(c => c.status === 'UNREAD')} />
@@ -354,31 +381,31 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-cream">Order Requests</h2>
-                <p className="mt-1 text-sm text-cream/50">{orderRequests.filter(o => o.status === 'UNREAD').length} unread of {orderRequests.length} total</p>
+                <h2 className="text-xl font-bold text-cream">Orders</h2>
+                <p className="mt-1 text-sm text-cream/50">{orders.filter(o => o.status === 'PENDING').length} pending of {orders.length} total</p>
               </div>
             </div>
 
-            {orderRequests.length === 0 ? (
+            {orders.length === 0 ? (
               <div className="flex flex-col items-center gap-3 py-20 text-cream/30">
                 <ShoppingBag size={40} />
-                <p>No order requests yet</p>
+                <p>No orders yet</p>
               </div>
             ) : (
               <div className="space-y-3">
-                {orderRequests.map((o) => (
-                  <div key={o.id} className={`rounded-2xl border transition-all ${o.status === 'UNREAD' ? 'border-amber/25 bg-amber/5' : 'border-cream/10 bg-cream/5'}`}>
+                {orders.map((o) => (
+                  <div key={o.id} className={`rounded-2xl border transition-all ${o.status === 'PENDING' ? 'border-amber/25 bg-amber/5' : 'border-cream/10 bg-cream/5'}`}>
                     <button
                       onClick={() => setExpandedId(expandedId === o.id ? null : o.id)}
                       className="flex w-full items-center justify-between p-4 text-left"
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`h-2 w-2 flex-shrink-0 rounded-full ${o.status === 'UNREAD' ? 'bg-amber' : 'bg-cream/20'}`} />
+                        <div className={`h-2 w-2 flex-shrink-0 rounded-full ${o.status === 'PENDING' ? 'bg-amber' : 'bg-cream/20'}`} />
                         <div>
-                          <p className="text-sm font-semibold text-cream">{o.name}
+                          <p className="text-sm font-semibold text-cream">{o.firstName} {o.lastName}
                             <span className="ml-2 text-xs font-normal text-cream/45">{o.email}</span>
                           </p>
-                          <p className="text-xs text-cream/60">{o.subject}</p>
+                          <p className="text-xs text-cream/60">Total: ₹{Number(o.totalAmount).toLocaleString()} · {o.items.length} items</p>
                         </div>
                       </div>
                       <div className="flex flex-shrink-0 items-center gap-2 ml-4">
@@ -390,24 +417,51 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
                     {expandedId === o.id && (
                       <div className="border-t border-cream/10 px-4 pb-4 pt-3">
-                        <pre className="text-sm leading-relaxed text-cream/80 whitespace-pre-wrap font-sans">{o.message}</pre>
-                        {o.phone && <p className="mt-2 text-xs text-cream/45">📞 {o.phone}</p>}
-                        <div className="mt-4 flex gap-2">
-                          {o.status === 'UNREAD' && (
-                            <button
-                              onClick={() => markRead(o.id)}
-                              className="flex items-center gap-1.5 rounded-lg bg-amber/15 px-3 py-1.5 text-xs font-semibold text-amber hover:bg-amber/25 transition-colors"
-                            >
-                              <Eye size={12} /> Mark as Read
-                            </button>
-                          )}
-                          <button
-                            onClick={() => deleteContact(o.id)}
-                            className="flex items-center gap-1.5 rounded-lg bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-400 hover:bg-red-500/20 transition-colors"
-                          >
-                            <Trash2 size={12} /> Delete
-                          </button>
+                        
+                        <div className="grid gap-6 md:grid-cols-2">
+                          {/* Items List */}
+                          <div>
+                            <h4 className="text-xs font-semibold uppercase tracking-widest text-cream/50 mb-3">Order Items</h4>
+                            <div className="space-y-3">
+                              {o.items.map(item => (
+                                <div key={item.id} className="flex gap-3 text-sm">
+                                  <div className="h-10 w-10 flex-shrink-0 rounded bg-cream/10 border border-cream/5 overflow-hidden">
+                                    {item.image && <img src={item.image} alt={item.name} className="h-full w-full object-cover" />}
+                                  </div>
+                                  <div>
+                                    <p className="font-semibold text-cream">{item.name}</p>
+                                    <p className="text-xs text-cream/60">{item.quantity} x ₹{Number(item.price).toLocaleString()}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Shipping Details */}
+                          <div>
+                            <h4 className="text-xs font-semibold uppercase tracking-widest text-cream/50 mb-3">Shipping Info</h4>
+                            <div className="text-sm text-cream/80 space-y-1">
+                              <p><span className="text-cream/40 w-16 inline-block">Phone:</span> {o.phone}</p>
+                              <p><span className="text-cream/40 w-16 inline-block">Address:</span> {o.address}</p>
+                              <p><span className="text-cream/40 w-16 inline-block">City:</span> {o.city}, {o.state} - {o.pincode}</p>
+                            </div>
+
+                            <h4 className="text-xs font-semibold uppercase tracking-widest text-cream/50 mt-4 mb-3">Update Status</h4>
+                            <div className="flex flex-wrap gap-2">
+                              {['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'].map(status => (
+                                <button
+                                  key={status}
+                                  onClick={() => updateOrdStatus(o.id, status)}
+                                  disabled={o.status === status}
+                                  className={`rounded-lg px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-widest transition-all ${o.status === status ? 'bg-cream/20 text-cream cursor-default' : 'bg-cream/5 text-cream/60 hover:bg-cream/10 hover:text-cream border border-cream/10'}`}
+                                >
+                                  {status}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
                         </div>
+
                       </div>
                     )}
                   </div>

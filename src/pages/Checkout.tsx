@@ -8,7 +8,7 @@ import { api } from "@/lib/api";
 
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,21 +42,15 @@ export default function Checkout() {
     setIsSubmitting(true);
 
     try {
-      // Create a formatted message for the contact endpoint or order endpoint
-      // Since we don't have an order endpoint yet, we can use the contact endpoint as a makeshift order receiver
-      // Or if there's an Order model, we could create an order endpoint.
-      // But let's just simulate the order for now or send it to contact.
-      const orderSummary = items.map(i => `${i.quantity}x ${i.name} (₹${i.price * i.quantity})`).join('\n');
-      const total = `\nTotal: ₹${totalPrice.toLocaleString()}`;
-      const fullMessage = `NEW ORDER REQUEST\n\nShipping Details:\nName: ${formData.firstName} ${formData.lastName}\nPhone: ${formData.phone}\nAddress: ${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}\n\nOrder Summary:\n${orderSummary}${total}`;
+      if (!token) {
+        throw new Error("You must be logged in to place an order.");
+      }
 
-      await api.post("/contact", {
-        name: `${formData.firstName} ${formData.lastName}`,
-        email: formData.email,
-        phone: formData.phone,
-        subject: "New Order Request",
-        message: fullMessage,
-      });
+      await api.post("/orders", {
+        items,
+        totalAmount: totalPrice,
+        ...formData
+      }, token);
 
       clearCart();
       setIsSuccess(true);
