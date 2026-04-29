@@ -124,7 +124,11 @@ export const updateMe = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('[Update Profile Error]:', error);
-    res.status(500).json({ status: 'error', message: 'Failed to update profile' });
+    console.error('[Update Profile Error Detail]:', error);
+    res.status(500).json({ 
+      status: 'error', 
+      message: error.message || 'Failed to update profile',
+      error: process.env.NODE_ENV === 'development' ? error : undefined 
+    });
   }
 };
