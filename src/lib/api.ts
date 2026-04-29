@@ -1,10 +1,13 @@
 const API_URL = import.meta.env.VITE_API_URL || 'https://himsaru-backend.onrender.com/api';
 
 export const api = {
-  post: async (endpoint: string, body: object) => {
+  post: async (endpoint: string, body: object, token?: string) => {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    
     const res = await fetch(`${API_URL}${endpoint}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(body),
     });
     const data = await res.json();
