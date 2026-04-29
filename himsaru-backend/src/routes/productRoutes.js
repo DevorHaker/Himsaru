@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   getAllProducts,
+  getAllProductsAdmin,
   getProduct,
   createProduct,
   updateProduct,
@@ -10,13 +11,14 @@ import { protect, requireAdmin } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
-// Public routes
-router.get('/', getAllProducts);
-router.get('/:identifier', getProduct);
-
-// Admin-only routes
+// Admin-only routes (must come before /:identifier to avoid being swallowed)
+router.get('/admin/all', protect, requireAdmin, getAllProductsAdmin);
 router.post('/', protect, requireAdmin, createProduct);
 router.put('/:id', protect, requireAdmin, updateProduct);
 router.delete('/:id', protect, requireAdmin, deleteProduct);
+
+// Public routes
+router.get('/', getAllProducts);
+router.get('/:identifier', getProduct);
 
 export default router;

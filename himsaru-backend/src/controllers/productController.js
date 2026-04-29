@@ -15,6 +15,20 @@ export const getAllProducts = async (req, res) => {
   }
 };
 
+// GET /api/products/admin/all
+// Admin route to fetch ALL products (all statuses)
+export const getAllProductsAdmin = async (req, res) => {
+  try {
+    const products = await prisma.product.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+    res.status(200).json({ status: 'success', data: products });
+  } catch (error) {
+    console.error('[Get All Products Admin Error]:', error);
+    res.status(500).json({ status: 'error', message: 'Failed to fetch products' });
+  }
+};
+
 // GET /api/products/:identifier
 // Public route to fetch a single product by ID or slug
 export const getProduct = async (req, res) => {
