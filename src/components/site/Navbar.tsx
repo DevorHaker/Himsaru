@@ -104,6 +104,14 @@ export const Navbar = () => {
                 </li>
               )}
               <li>
+                <Link
+                  to="/orders"
+                  className="text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-cream/70 hover:text-amber transition-colors"
+                >
+                  My Orders
+                </Link>
+              </li>
+              <li>
                 <button
                   onClick={logout}
                   className="flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-5 py-2 text-xs font-bold uppercase tracking-[0.15em] text-red-400 transition-all hover:bg-red-500/20"
@@ -175,6 +183,13 @@ export const Navbar = () => {
                       Admin Panel
                     </Link>
                   )}
+                  <Link
+                    to="/orders"
+                    onClick={() => setOpen(false)}
+                    className="block rounded-md px-4 py-3 text-sm font-semibold uppercase tracking-[0.15em] text-cream/70 hover:bg-white/5 hover:text-amber"
+                  >
+                    My Orders
+                  </Link>
                   <button
                     onClick={() => { logout(); setOpen(false); }}
                     className="flex w-full items-center gap-2 rounded-xl bg-red-500/15 px-4 py-3 text-sm font-bold uppercase tracking-[0.15em] text-red-400"

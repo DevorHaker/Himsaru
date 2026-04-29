@@ -84,6 +84,12 @@ export default function Checkout() {
           >
             Return to Home
           </button>
+          <button
+            onClick={() => navigate("/orders")}
+            className="rounded-full border border-cream/20 bg-cream/5 px-8 py-3 text-sm font-bold uppercase tracking-[0.15em] text-cream transition-all hover:bg-cream/10"
+          >
+            Track My Order
+          </button>
         </div>
       </div>
     );
