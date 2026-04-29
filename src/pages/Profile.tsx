@@ -8,6 +8,7 @@ import {
   Settings, LogOut, ChevronRight, CheckCircle2, RefreshCw
 } from "lucide-react";
 
+// Profile Page - Updated to ensure latest API helper is loaded
 export default function Profile() {
   const { user, token, logout, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
